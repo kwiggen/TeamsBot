@@ -1,0 +1,18 @@
+﻿{
+  "$schema": "https://statics.teams.microsoft.com/sdk/v0.4/manifest/MicrosoftTeams.schema.json",
+  "manifestVersion": "0.4",
+  "id": "88aa3ede-1d0a-4dd9-af10-013c194420aa",
+  "version": "1.0",
+  "developer": {
+    "name": "Microsfot EDU",
+    "websiteUrl": "https://website.com/",
+    "privacyUrl": "https://website.com/privacy",
+    "termsOfUseUrl": "https://website.com/app-tos"
+  },
+  "bots": [
+    {
+      "mri": "88aa3ede-1d0a-4dd9-af10-013c194420aa"
+    }
+  ],
+  "needsIdentity": true
+}

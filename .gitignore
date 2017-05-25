@@ -45,3 +45,8 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+/bin
+/obj
+/Web.Release.config
+/Web.Debug.config
+/Web.config
