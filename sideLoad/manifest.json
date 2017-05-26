@@ -1,6 +1,7 @@
 ﻿{
-  "$schema": "https://statics.teams.microsoft.com/sdk/v0.4/manifest/MicrosoftTeams.schema.json",
-  "manifestVersion": "0.4",
+  "$schema": "https://statics.teams.microsoft.com/sdk/v1.0/manifest/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.0",
+  "packageName": "com.microsoft.TeamsBot",
   "id": "88aa3ede-1d0a-4dd9-af10-013c194420aa",
   "version": "1.0",
   "developer": {
@@ -9,9 +10,22 @@
     "privacyUrl": "https://website.com/privacy",
     "termsOfUseUrl": "https://website.com/app-tos"
   },
+  "name": {
+    "short": "Demo Bot for Edu"
+  },
+  "description": {
+    "short": "Demo Bot for EDU",
+    "full": "Demo Bot for EDU"
+  },
+  "icons": {
+    "outline": "20x20.jpg",
+    "color": "96x96.png"
+  },
+  "accentColor": "#4464ee",
   "bots": [
     {
-      "mri": "88aa3ede-1d0a-4dd9-af10-013c194420aa"
+      "botId": "88aa3ede-1d0a-4dd9-af10-013c194420aa",
+      "scopes": [ "team", "personal" ]
     }
   ],
   "needsIdentity": true
