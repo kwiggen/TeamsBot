@@ -25,7 +25,31 @@
   "bots": [
     {
       "botId": "88aa3ede-1d0a-4dd9-af10-013c194420aa",
-      "scopes": [ "team", "personal" ]
+      "scopes": [ "team", "personal" ],
+      "commandLists": [
+        {
+          "scopes": [
+            "team"
+          ],
+          "commands": [
+            {
+              "title": "Next Class",
+              "description": "When is the Next Class?"
+            }
+          ]
+        },
+        {
+          "scopes": [
+            "personal"
+          ],
+          "commands": [
+            {
+              "title": "Current Grade",
+              "description": "What is my current Grade?"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
