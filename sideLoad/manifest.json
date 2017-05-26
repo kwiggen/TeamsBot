@@ -27,6 +27,5 @@
       "botId": "88aa3ede-1d0a-4dd9-af10-013c194420aa",
       "scopes": [ "team", "personal" ]
     }
-  ],
-  "needsIdentity": true
+  ]
 }
