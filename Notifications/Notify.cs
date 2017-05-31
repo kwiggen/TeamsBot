@@ -2,17 +2,20 @@
 using Microsoft.Bot.Connector.Teams;
 using Microsoft.Bot.Connector.Teams.Models;
 using System;
+using System.Web;
 using System.Configuration;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace TeamsBot.Notifications
 {
     public class Notify
     {
         //Need to replace teamId with Assignment GroupId and do the lookup to get the TeamId
-        public static async Task<ResourceResponse> Send1To1MessageToUser(string userAADID, string teamId, string tenantId, string messageToSend)
+        public static async Task<ResourceResponse> Send1To1MessageToUser(string userAADID, string teamId, string tenantId, 
+                                                                         string subEntityId, string messageToSend)
         {
             //we have an AADID for a User in a Team.  
             //Get the users for the Team
@@ -25,18 +28,20 @@ namespace TeamsBot.Notifications
             if (userTeamId == null) throw new ArgumentException("User not found in team", userAADID);
 
             ChannelAccount toUser = new ChannelAccount(id: userTeamId);
-            return await Send1To1MessageToUser(toUser, tenantId, messageToSend);
+            return await Send1To1MessageToUser(toUser, teamId, tenantId, subEntityId, messageToSend);
         }
 
-        public static async Task<ResourceResponse> Send1To1MessageToUser(ChannelAccount toUser, string toTenantId, string messageToSend)
+        public static async Task<ResourceResponse> Send1To1MessageToUser(ChannelAccount toUser, string teamId, string toTenantId, 
+                                                                         string subEntityId, string messageToSend)
         {
             try
             {
                 var response = CONNECTOR.Conversations.CreateOrGetDirectConversation(BOT_USER_ID, toUser, toTenantId);
              
                 IMessageActivity sendMe = Activity.CreateMessageActivity();
-                sendMe.Text = messageToSend;
+                //sendMe.Text = messageToSend;
                 sendMe.Type = ActivityTypes.Message;
+                sendMe.Attachments.Add(getCard(ASSIGNMNET_ENTITY_ID, teamId));
 
                 return await CONNECTOR.Conversations.SendToConversationAsync((Activity)sendMe, response.Id);
             }
@@ -46,7 +51,9 @@ namespace TeamsBot.Notifications
             }
         }
 
-        public static async Task<ConversationResourceResponse> SendMessageToGeneralChannelOfTeam(string teamId, string messageToSend)
+        public static async Task<ConversationResourceResponse> SendMessageToGeneralChannelOfTeam(string teamId, 
+                                                                                                 string subEntityId,
+                                                                                                 string messageToSend)
         {
             var channelData = new Dictionary<string, string>();
             channelData["teamsChannelId"] = teamId;
@@ -55,7 +62,7 @@ namespace TeamsBot.Notifications
           
             IMessageActivity newMessage = Activity.CreateMessageActivity();
             newMessage.Type = ActivityTypes.Message;
-            newMessage.Attachments.Add(getCard());
+            newMessage.Attachments.Add(getCard(ASSIGNMNET_ENTITY_ID, teamId));
             //newMessage.Text = messageToSend;
 
             ConversationParameters conversationParams = new ConversationParameters(isGroup: true,
@@ -73,8 +80,9 @@ namespace TeamsBot.Notifications
         }
 
 
-        private static Attachment getCard()
+        private static Attachment getCard(string subEntityId, string teamId)
         {
+            string deepLink = GetAssignmentDeepLink(subEntityId, teamId);
             var card = new ThumbnailCard
             {
                 Title = "Here be a Title",
@@ -83,15 +91,45 @@ namespace TeamsBot.Notifications
                 Images = new List<CardImage>(),
                 Buttons = new List<CardAction>
                 {
-                    new CardAction(type: ActionTypes.OpenUrl, title: "Open Microsoft", value: "https://www.microsoft.com/en-us/")
+                    new CardAction(type: ActionTypes.OpenUrl, title: "Go To Assignment", 
+                                   value: deepLink)
                 }
             };
             return card.ToAttachment();
         }
-        
+
+        private static string GetAssignmentDeepLink(string subEntityId, string teamId)
+        {
+            //first we need to create a Context for the Link
+            //the channelId for our Assignments tab is the TeamID as that is the
+            //channelId for the General Tab
+            Context context = new Context
+            {
+                subEntityId = subEntityId,
+                channelId = teamId
+            };
+
+            return ASSIGNMENT_DEEP_LINK_URL + HttpUtility.UrlEncode(ASSIGNMNET_APP_ID) +
+                   "/" + HttpUtility.UrlEncode(ASSIGNMNET_ENTITY_ID) + "?context="
+                   + HttpUtility.UrlEncode(JsonConvert.SerializeObject(context));
+
+
+        }
+
         private static ChannelAccount BOT_USER_ID = new ChannelAccount(id: ConfigurationManager.AppSettings["BotGUID"].ToString());
         private static ConnectorClient CONNECTOR = new ConnectorClient(new Uri(ConfigurationManager.AppSettings["BotFrameWorkURI"].ToString()),
                                                                        ConfigurationManager.AppSettings["MicrosoftAppId"].ToString(),
                                                                        ConfigurationManager.AppSettings["MicrosoftAppPassword"].ToString());
+
+        private static string ASSIGNMNET_APP_ID = "88aa3ede-1d0a-4dd9-af10-013c194420aa";
+        private static string ASSIGNMNET_ENTITY_ID = "entityId";
+        private static string ASSIGNMENT_DEEP_LINK_URL = "https://teams.microsoft.com/l/entity/";
+
+    }
+
+    class Context
+    {
+        public string subEntityId { get; set; }
+        public string channelId { get; set; }
     }
 }

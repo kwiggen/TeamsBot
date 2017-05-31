@@ -45,8 +45,8 @@ namespace TeamsBot.Dialogs
            
             string teamId = activity.GetChannelData<TeamsChannelData>().Team.Id;
             string tenantId = activity.GetTenantId();
-            var response = await Notify.Send1To1MessageToUser(KEVIN_AAD_ID, teamId, tenantId, "Hello World 1-1 from AssignmentsBot!!!");
-            var response2 = await Notify.SendMessageToGeneralChannelOfTeam(teamId, "New Conversation from TeamBot");
+            var response = await Notify.Send1To1MessageToUser(KEVIN_AAD_ID, teamId, tenantId, "subEntity123", "Hello World 1-1 from AssignmentsBot!!!");
+            var response2 = await Notify.SendMessageToGeneralChannelOfTeam(teamId, "subEntity456", "New Conversation from TeamBot");
 
 
             //now respond to what the user asked the bot directly

@@ -22,6 +22,13 @@
     "color": "96x96.png"
   },
   "accentColor": "#4464ee",
+  "configurableTabs": [
+    {
+      "configurationUrl": "https://542c7195.ngrok.io/config.html",
+      "canUpdateConfiguration": true,
+      "scopes": [ "team" ]
+    }
+  ],
   "bots": [
     {
       "botId": "88aa3ede-1d0a-4dd9-af10-013c194420aa",
@@ -51,5 +58,12 @@
         }
       ]
     }
+  ],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "*.ngrok.io"
   ]
 }
