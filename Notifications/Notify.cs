@@ -39,9 +39,19 @@ namespace TeamsBot.Notifications
                 var response = CONNECTOR.Conversations.CreateOrGetDirectConversation(BOT_USER_ID, toUser, toTenantId);
              
                 IMessageActivity sendMe = Activity.CreateMessageActivity();
-                //sendMe.Text = messageToSend;
+                sendMe.Text = "What is going on";
                 sendMe.Type = ActivityTypes.Message;
-                sendMe.Attachments.Add(getCard(ASSIGNMNET_ENTITY_ID, teamId));
+                sendMe.Summary = "Kevin Is Cool";
+                var ff = sendMe.ChannelData;
+                ChannelData data = new ChannelData
+                {
+                    notification = new Notification
+                    {
+                        alert = true
+                    }
+                };
+                sendMe.ChannelData = data;
+                //sendMe.Attachments.Add(getCard(ASSIGNMNET_ENTITY_ID, teamId));
 
                 return await CONNECTOR.Conversations.SendToConversationAsync((Activity)sendMe, response.Id);
             }
@@ -53,7 +63,9 @@ namespace TeamsBot.Notifications
 
         public static async Task<ConversationResourceResponse> SendMessageToGeneralChannelOfTeam(string teamId, 
                                                                                                  string subEntityId,
-                                                                                                 string messageToSend)
+                                                                                                 string title,
+                                                                                                 string subtitle,
+                                                                                                 string text)
         {
             var channelData = new Dictionary<string, string>();
             channelData["teamsChannelId"] = teamId;
@@ -62,8 +74,7 @@ namespace TeamsBot.Notifications
           
             IMessageActivity newMessage = Activity.CreateMessageActivity();
             newMessage.Type = ActivityTypes.Message;
-            newMessage.Attachments.Add(getCard(ASSIGNMNET_ENTITY_ID, teamId));
-            //newMessage.Text = messageToSend;
+            newMessage.Attachments.Add(getCard(ASSIGNMNET_ENTITY_ID, teamId, title, subtitle, text));
 
             ConversationParameters conversationParams = new ConversationParameters(isGroup: true,
                                                                                    bot: null,
@@ -74,20 +85,40 @@ namespace TeamsBot.Notifications
             return await CONNECTOR.Conversations.CreateConversationAsync(conversationParams);
         }
 
+        public static async Task<ResourceResponse> UpdateMessageToGeneralChannelOfTeam(string chanelId,
+                                                                                       string activityId,
+                                                                                       string teamId,
+                                                                                       string title,
+                                                                                       string subtitle,
+                                                                                       string text)
+        {
+          
+            IMessageActivity updateMessage = Activity.CreateMessageActivity();
+            updateMessage.Type = ActivityTypes.Message;
+            updateMessage.Attachments.Add(getCard(ASSIGNMNET_ENTITY_ID, teamId, title, subtitle, text));
+            try
+            {
+                return await CONNECTOR.Conversations.UpdateActivityAsync(chanelId, activityId, (Activity)updateMessage);
+            } catch (Exception e)
+            {
+                throw e;
+            }
+        }
+
         public static async Task<TeamsChannelAccount[]> GetMemeberOfTeamAsync(string teamId, string tenantId)
         {
             return await CONNECTOR.Conversations.GetTeamsConversationMembersAsync(teamId, tenantId);
         }
 
 
-        private static Attachment getCard(string subEntityId, string teamId)
+        private static Attachment getCard(string subEntityId, string teamId, string title, string subTitle, string text)
         {
             string deepLink = GetAssignmentDeepLink(subEntityId, teamId);
             var card = new ThumbnailCard
             {
-                Title = "Here be a Title",
-                Subtitle = "Here be a Subtitle",
-                Text = "And some text",
+                Title = title,
+                Subtitle = subTitle,
+                Text = text,
                 Images = new List<CardImage>(),
                 Buttons = new List<CardAction>
                 {
@@ -131,5 +162,15 @@ namespace TeamsBot.Notifications
     {
         public string subEntityId { get; set; }
         public string channelId { get; set; }
+    }
+
+    class ChannelData
+    {
+        public Notification notification { get; set; }
+    }
+
+    class Notification
+    {
+        public Boolean alert { get; set; }
     }
 }

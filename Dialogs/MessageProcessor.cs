@@ -46,7 +46,16 @@ namespace TeamsBot.Dialogs
             string teamId = activity.GetChannelData<TeamsChannelData>().Team.Id;
             string tenantId = activity.GetTenantId();
             var response = await Notify.Send1To1MessageToUser(KEVIN_AAD_ID, teamId, tenantId, "subEntity123", "Hello World 1-1 from AssignmentsBot!!!");
-            var response2 = await Notify.SendMessageToGeneralChannelOfTeam(teamId, "subEntity456", "New Conversation from TeamBot");
+            var response2 = await Notify.SendMessageToGeneralChannelOfTeam(teamId, "subEntity456", 
+                                                                           "Here be title", "Here by subtitle", "Here be text");
+
+
+            //now update the Activity we just sent to the GeneralChannel
+            //Put breakpoint here to watch the update
+            var activityId = response2.ActivityId;
+
+            var updateResponse = await Notify.UpdateMessageToGeneralChannelOfTeam(teamId, activityId, teamId, "Updated Title",
+                                                                                  "Updated subtitle", "Updated Text");
 
 
             //now respond to what the user asked the bot directly
